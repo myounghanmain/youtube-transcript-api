@@ -1,15 +1,17 @@
 from flask import Flask, jsonify
-from youtube_transcript_api import YouTubeTranscriptApi
+import youtube_transcript_api
 
 app = Flask(__name__)
 
 @app.route('/transcript/<video_id>')
 def get_transcript(video_id):
     try:
-        # 한국어(ko) 우선, 없으면 영어(en) 자막을 가져옴
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['ko', 'en'])
+        # 모듈을 직접 참조하여 호출 (가장 안전한 방법)
+        transcript = youtube_transcript_api.YouTubeTranscriptApi.get_transcript(
+            video_id, 
+            languages=['ko', 'en']
+        )
         
-        # 자막 텍스트만 하나로 합치기
         text = ' '.join([t['text'] for t in transcript])
         
         return jsonify({
@@ -18,7 +20,6 @@ def get_transcript(video_id):
             'success': True
         })
     except Exception as e:
-        # 에러 발생 시 상세 내용을 반환
         return jsonify({
             'videoId': video_id,
             'transcript': '',
