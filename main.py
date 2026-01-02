@@ -6,16 +6,23 @@ app = Flask(__name__)
 @app.route('/transcript/<video_id>')
 def get_transcript(video_id):
     try:
-        # 한글 우선, 없으면 영어
-        transcript = YouTubeTranscriptApi.get_transcript(
-            video_id, 
-            languages=['ko', 'en']
-        )
-        # 텍스트만 합치기
-        text = ' '.join([t['text'] for t in transcript])
+        # 1. 자막 리스트를 먼저 가져옴
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        
+        # 2. 한국어(ko) 또는 영어(en) 자막을 찾음 (자동 생성 포함)
+        try:
+            transcript = transcript_list.find_transcript(['ko', 'en'])
+        except:
+            # 3. 못 찾으면 아무 언어나 첫 번째 자막 시도
+            transcript = transcript_list.find_manually_created_transcript() or \
+                         transcript_list.find_generated_transcript()
+
+        data = transcript.fetch()
+        text = ' '.join([t['text'] for t in data])
         
         return jsonify({
             'videoId': video_id,
+            'language': transcript.language_code,
             'transcript': text,
             'success': True
         })
@@ -25,7 +32,7 @@ def get_transcript(video_id):
             'transcript': '',
             'success': False,
             'error': str(e)
-        }), 404
+        }), 200  # n8n에서 에러로 멈추지 않게 200으로 반환
 
 @app.route('/')
 def home():
