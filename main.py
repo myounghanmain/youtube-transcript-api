@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 import os
-# 모듈을 yta라는 별칭으로 가져와 클래스 이름과 확실히 분리합니다.
+# 별칭(yta)을 사용하여 모듈과 클래스 이름을 확실히 분리합니다.
 import youtube_transcript_api as yta
 
 app = Flask(__name__)
@@ -8,14 +8,14 @@ app = Flask(__name__)
 @app.route('/transcript/<video_id>')
 def get_transcript(video_id):
     try:
-        # yta(모듈) 안의 YouTubeTranscriptApi(클래스)를 명확히 호출합니다.
-        transcript_list = yta.YouTubeTranscriptApi.get_transcript(
+        # yta(모듈) 안의 YouTubeTranscriptApi(클래스)를 명확히 지정하여 호출합니다.
+        data = yta.YouTubeTranscriptApi.get_transcript(
             video_id, 
             languages=['ko', 'en']
         )
         
-        # 자막 텍스트만 합치기
-        full_text = ' '.join([t['text'] for t in transcript_list])
+        # 자막 텍스트만 하나로 합치기
+        full_text = ' '.join([t['text'] for t in data])
         
         return jsonify({
             'videoId': video_id,
