@@ -1,19 +1,21 @@
 from flask import Flask, jsonify
 import os
-from youtube_transcript_api import YouTubeTranscriptApi as yta
+from youtube_transcript import YouTubeTranscriptApi
 
 app = Flask(__name__)
 
 @app.route('/transcript/<video_id>')
 def get_transcript(video_id):
     try:
-        # .join으로 수정되었습니다.
-        transcript = yta.get_transcript(video_id, languages=['ko', 'en'])
-        text = ' '.join([t['text'] for t in transcript])
+        # 새로운 라이브러리 방식으로 호출
+        transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
+        
+        # 텍스트 데이터만 합치기
+        full_text = ' '.join([t['text'] for t in transcript_list])
         
         return jsonify({
             'videoId': video_id,
-            'transcript': text,
+            'transcript': full_text,
             'success': True
         })
     except Exception as e:
