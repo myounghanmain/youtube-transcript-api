@@ -6,10 +6,12 @@ app = Flask(__name__)
 @app.route('/transcript/<video_id>')
 def get_transcript(video_id):
     try:
+        # 한글 우선, 없으면 영어
         transcript = YouTubeTranscriptApi.get_transcript(
             video_id, 
             languages=['ko', 'en']
         )
+        # 텍스트만 합치기
         text = ' '.join([t['text'] for t in transcript])
         
         return jsonify({
