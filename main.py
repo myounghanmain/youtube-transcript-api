@@ -1,6 +1,5 @@
 from flask import Flask, jsonify
 import os
-# 가장 직접적인 임포트 방식을 사용합니다.
 from youtube_transcript_api import YouTubeTranscriptApi as yta
 
 app = Flask(__name__)
@@ -8,9 +7,9 @@ app = Flask(__name__)
 @app.route('/transcript/<video_id>')
 def get_transcript(video_id):
     try:
-        # 리스트를 뽑지 않고 바로 가져오기를 시도합니다.
+        # .join으로 수정되었습니다.
         transcript = yta.get_transcript(video_id, languages=['ko', 'en'])
-        text = ' '.json([t['text'] for t in transcript])
+        text = ' '.join([t['text'] for t in transcript])
         
         return jsonify({
             'videoId': video_id,
