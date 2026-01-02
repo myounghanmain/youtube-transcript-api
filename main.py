@@ -8,12 +8,15 @@ app = Flask(__name__)
 @app.route('/transcript/<video_id>')
 def get_transcript(video_id):
     try:
-        # 모듈 내의 YouTubeTranscriptApi 클래스를 명확히 호출합니다.
-        api = youtube_transcript_api.YouTubeTranscriptApi
-        transcript_list = api.get_transcript(video_id, languages=['ko', 'en'])
+        # 모듈 내의 YouTubeTranscriptApi 클래스를 명확하게 지정하여 호출합니다.
+        # youtube_transcript_api(모듈) . YouTubeTranscriptApi(클래스) . get_transcript(메서드)
+        data = youtube_transcript_api.YouTubeTranscriptApi.get_transcript(
+            video_id, 
+            languages=['ko', 'en']
+        )
         
-        # 자막 텍스트만 합치기
-        full_text = ' '.join([t['text'] for t in transcript_list])
+        # 자막 텍스트만 하나로 합치기
+        full_text = ' '.join([t['text'] for t in data])
         
         return jsonify({
             'videoId': video_id,
